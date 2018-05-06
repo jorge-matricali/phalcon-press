@@ -1,0 +1,37 @@
+version: '3'
+services:
+  web:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - .:/var/www/phalcon-press
+      - ./container/web/etc/nginx/conf/nginx.conf:/etc/nginx/conf/nginx.conf
+      - ./container/web/etc/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf
+    links:
+      - php
+
+  php:
+    build: ./container/php/
+    volumes:
+      - .:/var/www/phalcon-press
+    links:
+      - mysql
+      - memcached
+
+  mysql:
+    image: mariadb:10.1
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./container/mysql/var/lib/mysql:/var/lib/mysql
+    environment:
+      - MYSQL_DATABASE=phalcon-press
+      - MYSQL_USER=phalcon-press
+      - MYSQL_PASSWORD=ULTR4_S3CR3T
+      - MYSQL_ROOT_PASSWORD=ULTR4_S3CR3T
+
+  memcached:
+    image: memcached:alpine
+    ports:
+      - "11211:11211"
